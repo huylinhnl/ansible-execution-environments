@@ -1,22 +1,22 @@
 ---
-version: 3.0.1
+version: 1
 
-images:
-  base_image:
-    name: registry.redhat.io/ansible-automation-platform-24/ee-minimal-rhel8:latest
+build_arg_defaults:
+  EE_BASE_IMAGE: 'registry.redhat.io/ansible-automation-platform-21/ee-minimal-rhel8:1.0.0-48'
+  EE_BUILDER_IMAGE: 'registry.redhat.io/ansible-automation-platform-21/ansible-builder-rhel8:1.0.1-28'
+  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-cv'
+
+ansible_config: './ansible.cfg'
 
 dependencies:
-  galaxy:
-    collections:
-      - ansible.windows
-      - community.windows
-      - community.general
-      - ansible.utils
-      - ansible.posix
-      - chocolatey.chocolatey
-      - microsoft.ad
-  python:
-    - requests-credssp > 1.2.0
+  galaxy: ./requirements.yml
+  python: ./requirements.txt
+  system: ./bindep.txt
 
-options:
-  package_manager_path: /usr/bin/microdnf
+additional_build_steps:
+  prepend: |
+    RUN whoami
+    RUN cat /etc/os-release
+  append:
+    - RUN echo This is a post-install command!
+    - RUN ls -la /etc
